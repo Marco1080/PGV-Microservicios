@@ -119,11 +119,9 @@ public class AdminController {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle(producto == null ? "Añadir Producto" : "Modificar Producto");
 
-        // Creamos el `DialogPane`
         DialogPane dialogPane = new DialogPane();
         dialog.setDialogPane(dialogPane);
 
-        // Creamos los campos de entrada
         TextField nombreField = new TextField();
         nombreField.setPromptText("Nombre del producto");
 
@@ -148,12 +146,10 @@ public class AdminController {
 
         dialogPane.setContent(content);
 
-        // Botones dentro del `DialogPane`
         ButtonType saveButtonType = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogPane.getButtonTypes().addAll(saveButtonType, cancelButtonType);
 
-        // Evento del botón Guardar
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 String nombre = nombreField.getText();
@@ -161,7 +157,6 @@ public class AdminController {
                 int stock = Integer.parseInt(stockField.getText());
 
                 if (producto == null) {
-                    // Crear un nuevo producto
                     Producto nuevoProducto = new Producto(nombre, precio, stock);
                     apiService.agregarProducto(nuevoProducto).enqueue(new Callback<Producto>() {
                         @Override
@@ -175,7 +170,6 @@ public class AdminController {
                         }
                     });
                 } else {
-                    // Editar producto existente
                     producto.setNombre(nombre);
                     producto.setPrecio(precio);
                     producto.setStock(stock);
