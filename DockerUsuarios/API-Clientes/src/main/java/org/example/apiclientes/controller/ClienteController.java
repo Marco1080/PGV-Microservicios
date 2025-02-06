@@ -25,7 +25,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/cliente/{id}")
-    public String eliminarCliente(@PathVariable Integer id) {
+    public String eliminarCliente(@PathVariable String id) {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id);
             return "Cliente eliminado con éxito.";
@@ -35,7 +35,7 @@ public class ClienteController {
     }
 
     @PutMapping("/cliente/{id}")
-    public String actualizarCliente(@PathVariable Integer id, @RequestBody Cliente clienteActualizado) {
+    public String actualizarCliente(@PathVariable String id, @RequestBody Cliente clienteActualizado) {
         Optional<Cliente> clienteOptional = repositorio.findById(id);
         if (clienteOptional.isPresent()) {
             Cliente cliente = clienteOptional.get();

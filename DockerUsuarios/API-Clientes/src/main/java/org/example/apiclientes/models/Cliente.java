@@ -3,15 +3,17 @@ package org.example.apiclientes.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "clientes", schema = "usuarios")
+@Table(name = "clientes")
 public class Cliente {
+
     @Id
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "nombre", nullable = false, unique = true, length = 100)
     private String nombre;
 
-    @Column(name = "contrasena", nullable = false, length = 50)
+    @Column(name = "contrasena", nullable = false, length = 255) // Para almacenar hash de contraseñas
     private String contrasena;
 
+    // Getters y Setters
     public String getNombre() {
         return nombre;
     }
@@ -27,5 +29,4 @@ public class Cliente {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
-
 }
