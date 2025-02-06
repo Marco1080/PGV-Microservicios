@@ -1,8 +1,8 @@
 package org.example.apiproductos.models;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "productos")
@@ -20,6 +20,9 @@ public class Producto {
 
     @Column(name = "stock", nullable = false)
     private Integer stock;
+
+    @ManyToMany(mappedBy = "productos")
+    private List<Compra> compras;
 
     public Integer getId() {
         return id;
@@ -53,4 +56,11 @@ public class Producto {
         this.stock = stock;
     }
 
+    public List<Compra> getCompras() {
+        return compras;
+    }
+
+    public void setCompras(List<Compra> compras) {
+        this.compras = compras;
+    }
 }
