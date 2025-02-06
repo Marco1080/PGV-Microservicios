@@ -3,20 +3,27 @@ package org.compras.controller;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.compras.ApiService;
 import org.compras.model.Compra;
 import org.compras.model.Producto;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.compras.HelloApplication.*;
+import static org.compras.HelloApplication.showAdminView;
+import static org.compras.HelloApplication.showLoginView;
 
 public class ProductController {
 
     @FXML
     private TableView<Producto> productTableView;
     @FXML
-    private TableColumn<Producto, Long> idColumn;
+    private TableColumn<Producto, Integer> idColumn;
     @FXML
     private TableColumn<Producto, String> nombreColumn;
     @FXML
@@ -25,24 +32,28 @@ public class ProductController {
     private TableColumn<Producto, Integer> stockColumn;
 
     @FXML
-    private Button buyButton;
-    @FXML
-    private Button goToAdminButton, logoutButton;
+    private Button buyButton, goToAdminButton, logoutButton;
 
-    private List<Producto> productos = new ArrayList<>(); // Simulación de productos
+    private ApiService apiService;
+
+    private String usuarioLogueado = "usuario_test"; // Esta variable se actualizará en el login
 
     @FXML
     private void initialize() {
-        // Configurar las columnas para mostrar atributos de Producto
-        idColumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getId()).asObject());
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://localhost:8080")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        apiService = retrofit.create(ApiService.class);
+
+        idColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
         nombreColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNombre()));
         precioColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrecio()).asObject());
         stockColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getStock()).asObject());
 
-        // Simular carga de productos
         loadProducts();
 
-        // Botón para realizar la compra de productos seleccionados
         buyButton.setOnAction(e -> realizarCompra());
 
         goToAdminButton.setOnAction(e -> {
@@ -52,6 +63,7 @@ public class ProductController {
                 throw new RuntimeException(ex);
             }
         });
+
         logoutButton.setOnAction(e -> {
             try {
                 showLoginView();
@@ -64,36 +76,47 @@ public class ProductController {
     }
 
     private void loadProducts() {
-        productos.add(new Producto(1L, "Laptop", 1000.0, 5));
-        productos.add(new Producto(2L, "Smartphone", 500.0, 10));
-        productos.add(new Producto(3L, "Tablet", 300.0, 7));
-        refreshTable();
-    }
+        apiService.getProductos().enqueue(new Callback<List<Producto>>() {
+            @Override
+            public void onResponse(Call<List<Producto>> call, Response<List<Producto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    productTableView.getItems().setAll(response.body());
+                }
+            }
 
-    private void refreshTable() {
-        productTableView.getItems().setAll(productos);
+            @Override
+            public void onFailure(Call<List<Producto>> call, Throwable throwable) {
+                System.out.println("Error cargando productos: " + throwable.getMessage());
+            }
+        });
     }
 
     private void realizarCompra() {
-        List<Producto> selectedProducts = new ArrayList<>(productTableView.getSelectionModel().getSelectedItems());
+        List<Producto> productosSeleccionados = new ArrayList<>(productTableView.getSelectionModel().getSelectedItems());
 
-        if (selectedProducts.isEmpty()) {
+        if (productosSeleccionados.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Debes seleccionar al menos un producto para comprar.");
             return;
         }
 
-        double totalPrecio = selectedProducts.stream().mapToDouble(Producto::getPrecio).sum();
-        String productosComprados = selectedProducts.stream()
-                .map(Producto::getNombre)
-                .reduce((p1, p2) -> p1 + ", " + p2)
-                .orElse("");
+        Compra compra = new Compra(usuarioLogueado, productosSeleccionados);
 
-        // Simulación de la compra
-        Compra compra = new Compra("Usuario1", selectedProducts);
-        System.out.println("Compra realizada para: " + compra.getUsuario() + " - Productos: " + productosComprados);
+        apiService.realizarCompra(compra).enqueue(new Callback<Compra>() {
+            @Override
+            public void onResponse(Call<Compra> call, Response<Compra> response) {
+                if (response.isSuccessful()) {
+                    showAlert(Alert.AlertType.INFORMATION, "Compra realizada con éxito.");
+                    loadProducts();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error al realizar la compra.");
+                }
+            }
 
-        showAlert(Alert.AlertType.INFORMATION,
-                "Compra realizada con éxito:\nProductos: " + productosComprados + "\nTotal: " + totalPrecio + "€");
+            @Override
+            public void onFailure(Call<Compra> call, Throwable throwable) {
+                showAlert(Alert.AlertType.ERROR, "Error de conexión: " + throwable.getMessage());
+            }
+        });
     }
 
     private void showAlert(Alert.AlertType type, String message) {
@@ -102,3 +125,4 @@ public class ProductController {
         alert.showAndWait();
     }
 }
+

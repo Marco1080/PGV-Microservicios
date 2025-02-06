@@ -3,7 +3,7 @@ package org.compras.model;
 import java.util.List;
 
 public class Compra {
-    private Long id;
+    private Integer id;
     private String usuario;
     private List<Producto> productos;
 
@@ -12,7 +12,7 @@ public class Compra {
         this.productos = productos;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -24,7 +24,7 @@ public class Compra {
         return productos;
     }
 
-    public Compra(Long id, String usuario, List<Producto> productos) {
+    public Compra(Integer id, String usuario, List<Producto> productos) {
         this.id = id;
         this.usuario = usuario;
         this.productos = productos;

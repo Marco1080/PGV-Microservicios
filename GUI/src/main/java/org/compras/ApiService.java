@@ -9,19 +9,20 @@ import java.util.List;
 
 public interface ApiService {
 
-    @GET("/productos")
+    @GET("/api/productos")
     Call<List<Producto>> getProductos();
 
-    @POST("/producto")
+    @POST("/api/producto")
     Call<Producto> agregarProducto(@Body Producto producto);
 
-    @PUT("/producto/{id}")
-    Call<Producto> actualizarProducto(@Path("id") Long id, @Body Producto producto);
+    @PUT("/api/producto/{id}")
+    Call<String> actualizarProducto(@Path("id") Integer id, @Body Producto producto);
 
-    @DELETE("/producto/{id}")
-    Call<Void> eliminarProducto(@Path("id") Long id);
+    @DELETE("/api/producto/{id}")
+    Call<String> eliminarProducto(@Path("id") Integer id);
 
-    @POST("/compra")
+    @POST("/api/compra")
     Call<Compra> realizarCompra(@Body Compra compra);
 }
+
 

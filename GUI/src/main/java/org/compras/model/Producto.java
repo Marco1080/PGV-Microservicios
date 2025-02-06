@@ -1,7 +1,7 @@
 package org.compras.model;
 
 public class Producto {
-    private Long id;
+    private Integer id;
     private String nombre;
     private double precio;
     private int stock;
@@ -15,14 +15,14 @@ public class Producto {
         this.stock = stock;
     }
 
-    public Producto(long id, String nombre, double precio, int stock) {
+    public Producto(Integer id, String nombre, double precio, int stock) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.stock = stock;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -38,7 +38,7 @@ public class Producto {
         return stock;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

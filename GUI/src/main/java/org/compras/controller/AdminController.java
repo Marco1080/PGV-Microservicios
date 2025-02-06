@@ -1,18 +1,17 @@
 package org.compras.controller;
 
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import org.compras.model.*;
+import org.compras.ApiService;
+import org.compras.model.Producto;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.compras.HelloApplication.showLoginView;
@@ -23,7 +22,7 @@ public class AdminController {
     @FXML
     private TableView<Producto> productTableView;
     @FXML
-    private TableColumn<Producto, Long> idColumn;
+    private TableColumn<Producto, Integer> idColumn;
     @FXML
     private TableColumn<Producto, String> nombreColumn;
     @FXML
@@ -36,21 +35,34 @@ public class AdminController {
     @FXML
     private Button goToProductsButton, logoutButton;
 
-    private List<Producto> productos = new ArrayList<>(); // Simulación de productos
+    private ApiService apiService;
 
     @FXML
     private void initialize() {
-        // Configurar las columnas
-        idColumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getId()).asObject());
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://localhost:8080")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        apiService = retrofit.create(ApiService.class);
+
+        idColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
         nombreColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNombre()));
         precioColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrecio()).asObject());
         stockColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getStock()).asObject());
 
-        // Simular carga de productos
         loadProducts();
 
-        // Botón para añadir productos
         addButton.setOnAction(e -> openProductForm(null));
+        updateButton.setOnAction(e -> {
+            Producto selectedProduct = productTableView.getSelectionModel().getSelectedItem();
+            if (selectedProduct != null) {
+                openProductForm(selectedProduct);
+            }
+        });
+
+        deleteButton.setOnAction(e -> eliminarProductos());
+
         goToProductsButton.setOnAction(e -> {
             try {
                 showProductView();
@@ -58,6 +70,7 @@ public class AdminController {
                 throw new RuntimeException(ex);
             }
         });
+
         logoutButton.setOnAction(e -> {
             try {
                 showLoginView();
@@ -66,66 +79,124 @@ public class AdminController {
             }
         });
 
-        // Botón para modificar productos
-        updateButton.setOnAction(e -> {
-            Producto selectedProduct = productTableView.getSelectionModel().getSelectedItem();
-            if (selectedProduct != null) {
-                openProductForm(selectedProduct);
-            }
-        });
-
-        // Botón para eliminar productos seleccionados
-        deleteButton.setOnAction(e -> {
-            List<Producto> selectedProducts = new ArrayList<>(productTableView.getSelectionModel().getSelectedItems());
-            selectedProducts.forEach(product -> {
-                productos.removeIf(p -> p.getId().equals(product.getId()));
-                System.out.println("Producto eliminado: " + product.getNombre());
-            });
-            refreshTable();
-        });
-
         productTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     private void loadProducts() {
-        productos.add(new Producto(1L, "Laptop", 1000.0, 5));
-        productos.add(new Producto(2L, "Smartphone", 500.0, 10));
-        productos.add(new Producto(3L, "Tablet", 300.0, 7));
-        refreshTable();
+        apiService.getProductos().enqueue(new Callback<List<Producto>>() {
+            @Override
+            public void onResponse(Call<List<Producto>> call, Response<List<Producto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    productTableView.getItems().setAll(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Producto>> call, Throwable throwable) {
+                System.out.println("Error cargando productos: " + throwable.getMessage());
+            }
+        });
     }
 
-    private void refreshTable() {
-        productTableView.getItems().setAll(productos);
+    private void eliminarProductos() {
+        Producto selectedProduct = productTableView.getSelectionModel().getSelectedItem();
+        if (selectedProduct != null) {
+            apiService.eliminarProducto(selectedProduct.getId()).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    loadProducts();
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable throwable) {
+                    System.out.println("Error eliminando producto: " + throwable.getMessage());
+                }
+            });
+        }
     }
 
     private void openProductForm(Producto producto) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText(producto == null ? "Añadir Producto" : "Modificar Producto");
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle(producto == null ? "Añadir Producto" : "Modificar Producto");
 
-        TextField nameField = new TextField(producto != null ? producto.getNombre() : "");
-        TextField priceField = new TextField(producto != null ? String.valueOf(producto.getPrecio()) : "");
-        TextField stockField = new TextField(producto != null ? String.valueOf(producto.getStock()) : "");
+        // Creamos el `DialogPane`
+        DialogPane dialogPane = new DialogPane();
+        dialog.setDialogPane(dialogPane);
 
-        dialog.getDialogPane().setContent(new VBox(10,
-                new Label("Nombre:"), nameField,
-                new Label("Precio (€):"), priceField,
+        // Creamos los campos de entrada
+        TextField nombreField = new TextField();
+        nombreField.setPromptText("Nombre del producto");
+
+        TextField precioField = new TextField();
+        precioField.setPromptText("Precio");
+
+        TextField stockField = new TextField();
+        stockField.setPromptText("Stock");
+
+        if (producto != null) {
+            nombreField.setText(producto.getNombre());
+            precioField.setText(String.valueOf(producto.getPrecio()));
+            stockField.setText(String.valueOf(producto.getStock()));
+        }
+
+        VBox content = new VBox(10);
+        content.getChildren().addAll(
+                new Label("Nombre:"), nombreField,
+                new Label("Precio (€):"), precioField,
                 new Label("Stock:"), stockField
-        ));
+        );
 
-        dialog.showAndWait().ifPresent(result -> {
-            String nombre = nameField.getText();
-            double precio = Double.parseDouble(priceField.getText());
-            int stock = Integer.parseInt(stockField.getText());
+        dialogPane.setContent(content);
 
-            if (producto == null) {
-                Producto nuevoProducto = new Producto((long) (productos.size() + 1), nombre, precio, stock);
-                productos.add(nuevoProducto);
-            } else {
-                producto.setNombre(nombre);
-                producto.setPrecio(precio);
-                producto.setStock(stock);
+        // Botones dentro del `DialogPane`
+        ButtonType saveButtonType = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogPane.getButtonTypes().addAll(saveButtonType, cancelButtonType);
+
+        // Evento del botón Guardar
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                String nombre = nombreField.getText();
+                double precio = Double.parseDouble(precioField.getText());
+                int stock = Integer.parseInt(stockField.getText());
+
+                if (producto == null) {
+                    // Crear un nuevo producto
+                    Producto nuevoProducto = new Producto(nombre, precio, stock);
+                    apiService.agregarProducto(nuevoProducto).enqueue(new Callback<Producto>() {
+                        @Override
+                        public void onResponse(Call<Producto> call, Response<Producto> response) {
+                            loadProducts(); // Recargar productos después de añadir
+                        }
+
+                        @Override
+                        public void onFailure(Call<Producto> call, Throwable throwable) {
+                            System.out.println("Error al agregar producto: " + throwable.getMessage());
+                        }
+                    });
+                } else {
+                    // Editar producto existente
+                    producto.setNombre(nombre);
+                    producto.setPrecio(precio);
+                    producto.setStock(stock);
+                    apiService.actualizarProducto(producto.getId(), producto).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            loadProducts(); // Recargar productos después de modificar
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable throwable) {
+                            System.out.println("Error al actualizar producto: " + throwable.getMessage());
+                        }
+                    });
+                }
             }
-            refreshTable();
+            return null;
         });
+
+        dialog.showAndWait();
     }
+
 }
+
