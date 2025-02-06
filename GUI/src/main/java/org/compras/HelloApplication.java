@@ -30,7 +30,6 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/org/compras/product_view.fxml"));
         Parent root = fxmlLoader.load();
 
-        // Obtener el controlador y pasarle el username
         ProductController productController = fxmlLoader.getController();
         productController.setUsername(username);
 
@@ -42,7 +41,6 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/org/compras/admin_view.fxml"));
         Parent root = fxmlLoader.load();
 
-        // Obtener el controlador y pasarle el username
         AdminController adminController = fxmlLoader.getController();
         adminController.setUsername(username);
 

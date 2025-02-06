@@ -5,20 +5,80 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Button?>
+
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.compras.controller.LoginController"
-      spacing="10" alignment="CENTER" styleClass="container" style="-fx-padding: 20;">
+      spacing="15"
+      alignment="CENTER"
+      style="
+          -fx-background-color: #ffffff;
+          -fx-padding: 30px;
+          -fx-border-radius: 12px;
+          -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 12, 0, 0, 6);
+      ">
 
-    <Label text="Iniciar Sesión" styleClass="h2 text-success"/>
+    <Label text="Iniciar sesión"
+           style="
+               -fx-font-size: 26px;
+               -fx-font-weight: bold;
+               -fx-text-fill: #007bff;
+               -fx-padding-bottom: 10px;
+           "/>
 
-    <TextField fx:id="usernameField" promptText="Usuario" styleClass="form-control" />
-    <PasswordField fx:id="passwordField" promptText="Contraseña" styleClass="form-control" />
+    <TextField fx:id="usernameField" promptText="Usuario"
+               style="
+                   -fx-pref-width: 280px;
+                   -fx-padding: 12px;
+                   -fx-font-size: 14px;
+                   -fx-border-color: #ced4da;
+                   -fx-border-radius: 6px;
+                   -fx-background-radius: 6px;
+               "/>
 
-    <Button fx:id="loginButton" text="Iniciar Sesión" onAction="#handleLogin" styleClass="btn btn-success btn-block" />
-    <Button fx:id="registerButton" text="Registrarse" onAction="#handleRegister"/>
+    <PasswordField fx:id="passwordField" promptText="Contraseña"
+                   style="
+                       -fx-pref-width: 280px;
+                       -fx-padding: 12px;
+                       -fx-font-size: 14px;
+                       -fx-border-color: #ced4da;
+                       -fx-border-radius: 6px;
+                       -fx-background-radius: 6px;
+                   "/>
 
-    <Label fx:id="errorLabel" text="" styleClass="alert alert-danger" visible="false" />
+    <Button fx:id="loginButton" text="Iniciar" onAction="#handleLogin"
+            style="
+                -fx-pref-width: 280px;
+                -fx-padding: 12px;
+                -fx-font-size: 16px;
+                -fx-font-weight: bold;
+                -fx-border-radius: 6px;
+                -fx-cursor: hand;
+                -fx-background-color: #007bff;
+                -fx-text-fill: white;
+                -fx-border-color: #007bff;
+            "/>
+
+    <Button fx:id="registerButton" text="Registrarse" onAction="#handleRegister"
+            style="
+                -fx-pref-width: 280px;
+                -fx-padding: 12px;
+                -fx-font-size: 16px;
+                -fx-font-weight: bold;
+                -fx-border-radius: 6px;
+                -fx-cursor: hand;
+                -fx-background-color: #6c757d;
+                -fx-text-fill: white;
+                -fx-border-color: #6c757d;
+            "/>
+
+    <Label fx:id="errorLabel" text="Usuario o contraseña incorrectos" visible="false"
+           style="
+               -fx-text-fill: #dc3545;
+               -fx-font-size: 14px;
+               -fx-padding: 5px;
+               -fx-font-weight: bold;
+               -fx-opacity: 0;
+           "/>
+
 </VBox>
-
-

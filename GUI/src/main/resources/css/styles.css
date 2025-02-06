@@ -1,0 +1,53 @@
+.container {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 30px;
+    -fx-border-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 10, 0, 0, 5);
+}
+
+.title-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #007bff;
+}
+
+.input-field {
+    -fx-pref-width: 250px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.btn {
+    -fx-pref-width: 250px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5px;
+}
+
+.btn-primary {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-border-color: #007bff;
+}
+
+.btn-secondary {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-border-color: #6c757d;
+}
+
+.btn-hover:hover {
+    -fx-background-color: #0056b3;
+    -fx-cursor: hand;
+}
+
+.error-label {
+    -fx-text-fill: #dc3545;
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+    -fx-font-weight: bold;
+}
