@@ -24,7 +24,7 @@ public class LoginController {
 
     public void initialize() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:9090/api/") // Asegúrate de que este puerto sea el correcto
+                .baseUrl("http://localhost:9090") // Asegúrate de que este puerto sea el correcto
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -47,11 +47,11 @@ public class LoginController {
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Platform.runLater(() -> { // Asegura que la UI se actualice en el hilo correcto
+                Platform.runLater(() -> {
                     if (response.isSuccessful() && response.body() != null && response.body().equals("200")) {
                         showAlert("Éxito", "Usuario registrado correctamente.");
                         try {
-                            HelloApplication.showProductView(username); // Ir a la vista de productos
+                            HelloApplication.showProductView(username);
                         } catch (Exception e) {
                             e.printStackTrace();
                             showAlert("Error", "No se pudo abrir la vista de productos.");
@@ -79,8 +79,7 @@ public class LoginController {
             return;
         }
 
-        Cliente cliente = new Cliente(username, password);
-        Call<String> call = apiService.verificaUsuario(Cliente);
+        Call<String> call = apiService.verificarUsuario(username, password);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -112,7 +111,7 @@ public class LoginController {
     }
 
     private void showAlert(String title, String message) {
-        Platform.runLater(() -> { // Asegura que la alerta se ejecute en el hilo de JavaFX
+        Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle(title);
             alert.setHeaderText(null);
