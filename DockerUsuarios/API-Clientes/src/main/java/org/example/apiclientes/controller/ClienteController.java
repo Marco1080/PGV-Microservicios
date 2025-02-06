@@ -47,4 +47,19 @@ public class ClienteController {
             return "Cliente no encontrado.";
         }
     }
+
+    @PostMapping("/cliente/verificar/{id}")
+    public String verificarContrasena(@PathVariable Integer id, @RequestBody String contrasena) {
+        Optional<Cliente> clienteOptional = repositorio.findById(id);
+        if (clienteOptional.isPresent()) {
+            Cliente cliente = clienteOptional.get();
+            if (cliente.getContrasena().equals(contrasena)) {
+                return "200";
+            } else {
+                return "400";
+            }
+        } else {
+            return "400";
+        }
+    }
 }
