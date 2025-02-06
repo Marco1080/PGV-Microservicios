@@ -29,12 +29,10 @@ public class ClienteController {
     }
 
     @GetMapping("/user")
-    public String verificarUsuario(@RequestParam Cliente cliente) {
-        String nombre = cliente.getNombre();
-        String contrasena = cliente.getContrasena();
+    public String verificarUsuario(@RequestParam String nombre, @RequestParam String contrasena) {
         Optional<Cliente> clienteOpt = repositorio.findById(nombre);
         if (clienteOpt.isPresent()) {
-            cliente = clienteOpt.get();
+            Cliente cliente = clienteOpt.get();
             if (passwordEncoder.matches(contrasena, cliente.getContrasena())) {
                 return "Usuario autenticado correctamente";
             } else {
