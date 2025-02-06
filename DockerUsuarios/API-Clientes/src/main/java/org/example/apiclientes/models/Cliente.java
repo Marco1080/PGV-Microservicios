@@ -13,7 +13,6 @@ public class Cliente {
     @Column(name = "contrasena", nullable = false, length = 255) // Para almacenar hash de contraseñas
     private String contrasena;
 
-    // Getters y Setters
     public String getNombre() {
         return nombre;
     }

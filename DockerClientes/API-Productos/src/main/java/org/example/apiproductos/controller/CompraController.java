@@ -11,7 +11,6 @@ public class CompraController {
     @Autowired
     private CompraRepository compraRepository;
 
-    // Agregar una nueva compra
     @PostMapping("/compra")
     public Compra agregarCompra(@RequestBody Compra compra) {
         return compraRepository.save(compra);

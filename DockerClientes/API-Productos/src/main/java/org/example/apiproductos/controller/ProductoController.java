@@ -14,19 +14,16 @@ public class ProductoController {
     @Autowired
     private ProductosRepository repositorio;
 
-    // Obtener todos los productos
     @GetMapping("/productos")
     public List<Producto> obtenerProductos() {
         return repositorio.findAll();
     }
 
-    // Agregar un producto
     @PostMapping("/producto")
     public Producto agregarProducto(@RequestBody Producto producto) {
         return repositorio.save(producto);
     }
 
-    // Eliminar un producto por ID
     @DeleteMapping("/producto/{id}")
     public String eliminarProducto(@PathVariable Integer id) {
         if (repositorio.existsById(id)) {
@@ -37,7 +34,6 @@ public class ProductoController {
         }
     }
 
-    // Actualizar un producto por ID
     @PutMapping("/producto/{id}")
     public String actualizarProducto(@PathVariable Integer id, @RequestBody Producto productoActualizado) {
         Optional<Producto> productoOptional = repositorio.findById(id);
