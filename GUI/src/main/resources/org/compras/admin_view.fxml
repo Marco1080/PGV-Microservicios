@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.compras.controller.AdminController"
+      spacing="10" alignment="CENTER" styleClass="bg-primary" style="-fx-padding: 20;" >
+
+    <VBox spacing="0">
+        <Label text="Gestión de Productos"
+               styleClass="h2, text-light, bg-primary, p-2, rounded" />
+    </VBox>
+
+    <TableView fx:id="productTableView" prefHeight="300" minWidth="400"
+               styleClass="table table-striped table-bordered">
+        <columns>
+            <TableColumn text="ID" fx:id="idColumn" prefWidth="50" />
+            <TableColumn text="Nombre" fx:id="nombreColumn" prefWidth="150" />
+            <TableColumn text="Precio (€)" fx:id="precioColumn" prefWidth="100" />
+            <TableColumn text="Stock" fx:id="stockColumn" prefWidth="100" />
+        </columns>
+    </TableView>
+
+    <HBox spacing="10" alignment="CENTER" styleClass="btn-group">
+        <Button fx:id="addButton" text="Añadir Producto" styleClass="btn, btn-success" />
+        <Button fx:id="updateButton" text="Modificar Producto" styleClass="btn, btn-warning" />
+        <Button fx:id="deleteButton" text="Eliminar Seleccionados" styleClass="btn, btn-danger" />
+    </HBox>
+
+    <!-- Botones de Navegación -->
+    <HBox spacing="10" alignment="CENTER" styleClass="btn-group">
+        <Button fx:id="goToProductsButton" text="Ver Productos" styleClass="btn, btn-info" />
+        <Button fx:id="logoutButton" text="Cerrar Sesión" styleClass="btn, btn-secondary" />
+    </HBox>
+</VBox>
