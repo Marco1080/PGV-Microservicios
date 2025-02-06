@@ -15,7 +15,9 @@
     <TextField fx:id="usernameField" promptText="Usuario" styleClass="form-control" />
     <PasswordField fx:id="passwordField" promptText="Contraseña" styleClass="form-control" />
 
-    <Button fx:id="loginButton" text="Iniciar Sesión" styleClass="btn btn-success btn-block" />
+    <Button fx:id="loginButton" text="Iniciar Sesión" onAction="#handleLogin" styleClass="btn btn-success btn-block" />
+    <Button fx:id="registerButton" text="Registrarse" onAction="#handleRegister"/>
+
     <Label fx:id="errorLabel" text="" styleClass="alert alert-danger" visible="false" />
 </VBox>
 

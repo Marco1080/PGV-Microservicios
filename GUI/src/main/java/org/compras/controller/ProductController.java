@@ -36,7 +36,7 @@ public class ProductController {
 
     private ApiService apiService;
 
-    private String usuarioLogueado = "usuario_test"; // Esta variable se actualizará en el login
+    private String username = ""; // Esta variable se actualizará en el login
 
     @FXML
     private void initialize() {
@@ -58,7 +58,7 @@ public class ProductController {
 
         goToAdminButton.setOnAction(e -> {
             try {
-                showAdminView();
+                showAdminView(username);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -99,7 +99,7 @@ public class ProductController {
             return;
         }
 
-        Compra compra = new Compra(usuarioLogueado, productosSeleccionados);
+        Compra compra = new Compra(username, productosSeleccionados);
 
         apiService.realizarCompra(compra).enqueue(new Callback<Compra>() {
             @Override
@@ -123,6 +123,10 @@ public class ProductController {
         Alert alert = new Alert(type);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
 

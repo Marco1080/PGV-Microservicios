@@ -25,11 +25,15 @@ public interface ApiService {
     @POST("/api/compra")
     Call<Compra> realizarCompra(@Body Compra compra);
 
-    @POST("/login")
-    Call<Void> login(@Body Cliente cliente);
+    @POST("/api/login")
+    Call<String> login(@Body Cliente cliente);
 
-    @GET("/cliente")
-    Call<Cliente> getCliente();
+    @GET("/api/user")
+    Call<Cliente> verificaUsuario(@Query("nombre") String nombre, @Query("contrasena") String contrasena);
+
+    @POST("login")
+    Call<String> registrarUsuario(@Body Cliente cliente);
 }
+
 
 

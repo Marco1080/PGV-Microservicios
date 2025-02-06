@@ -20,12 +20,12 @@ public class ClienteController {
     @PostMapping("/login")
     public String crearUsuario(@RequestBody Cliente cliente) {
         if (repositorio.findById(cliente.getNombre()).isPresent()) {
-            return "El usuario ya existe";
+            return "400";
         }
 
         cliente.setContrasena(passwordEncoder.encode(cliente.getContrasena()));
         repositorio.save(cliente);
-        return "Usuario creado con éxito";
+        return "200";
     }
 
     @GetMapping("/user")

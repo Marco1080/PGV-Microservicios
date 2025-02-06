@@ -36,6 +36,7 @@ public class AdminController {
     private Button goToProductsButton, logoutButton;
 
     private ApiService apiService;
+    private String username = "";
 
     @FXML
     private void initialize() {
@@ -65,7 +66,7 @@ public class AdminController {
 
         goToProductsButton.setOnAction(e -> {
             try {
-                showProductView();
+                showProductView(username);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -192,5 +193,8 @@ public class AdminController {
         dialog.showAndWait();
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
 
