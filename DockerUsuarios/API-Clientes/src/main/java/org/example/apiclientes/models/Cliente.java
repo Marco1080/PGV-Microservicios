@@ -6,23 +6,11 @@ import jakarta.persistence.*;
 @Table(name = "clientes", schema = "usuarios")
 public class Cliente {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cliente", nullable = false)
-    private Integer id;
-
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
     @Column(name = "contrasena", nullable = false, length = 50)
     private String contrasena;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getNombre() {
         return nombre;

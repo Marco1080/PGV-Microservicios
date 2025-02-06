@@ -49,7 +49,7 @@ public class ClienteController {
     }
 
     @PostMapping("/cliente/verificar/{id}")
-    public String verificarContrasena(@PathVariable Integer id, @RequestBody String contrasena) {
+    public String verificarContrasena(@PathVariable String id, @RequestBody String contrasena) {
         Optional<Cliente> clienteOptional = repositorio.findById(id);
         if (clienteOptional.isPresent()) {
             Cliente cliente = clienteOptional.get();
