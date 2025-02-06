@@ -5,61 +5,63 @@ import org.example.apiclientes.repository.ClientesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class ClienteController {
+
     @Autowired
     private ClientesRepository repositorio;
 
-    @GetMapping("/clientes")
-    public List<Cliente> obtenerClientes() {
-        return repositorio.findAll();
-    }
-
-    @PostMapping("/cliente")
-    public Cliente agregarCliente(@RequestBody Cliente cliente) {
-        return repositorio.save(cliente);
-    }
-
-    @DeleteMapping("/cliente/{id}")
-    public String eliminarCliente(@PathVariable String id) {
-        if (repositorio.existsById(id)) {
-            repositorio.deleteById(id);
-            return "Cliente eliminado con éxito.";
-        } else {
-            return "Cliente no encontrado.";
+    @PostMapping("/login")
+    public String crearUsuario(@RequestBody Cliente cliente) {
+        // Verificar si el usuario ya existe
+        if (repositorio.findById(cliente.getNombre()).isPresent()) {
+            return "El usuario ya existe";
         }
+
+        // Cifrar la contraseña antes de guardarla
+        cliente.setContrasena(hashPassword(cliente.getContrasena()));
+        repositorio.save(cliente);
+        return "Usuario creado con éxito";
     }
 
-    @PutMapping("/cliente/{id}")
-    public String actualizarCliente(@PathVariable String id, @RequestBody Cliente clienteActualizado) {
-        Optional<Cliente> clienteOptional = repositorio.findById(id);
-        if (clienteOptional.isPresent()) {
-            Cliente cliente = clienteOptional.get();
-            cliente.setNombre(clienteActualizado.getNombre());
-            cliente.setContrasena(clienteActualizado.getContrasena());
-            repositorio.save(cliente);
-            return "Cliente actualizado correctamente.";
-        } else {
-            return "Cliente no encontrado.";
-        }
-    }
-
-    @PostMapping("/cliente/verificar/{id}")
-    public String verificarContrasena(@PathVariable String cli, @RequestBody String contrasena) {
-        Optional<Cliente> clienteOptional = repositorio.findById(id);
-        if (clienteOptional.isPresent()) {
-            Cliente cliente = clienteOptional.get();
-            if (cliente.getContrasena().equals(contrasena)) {
-                return "200";
+    @GetMapping("/user")
+    public String verificarUsuario(@RequestParam String nombre, @RequestParam String contrasena) {
+        Optional<Cliente> clienteOpt = repositorio.findById(nombre);
+        if (clienteOpt.isPresent()) {
+            Cliente cliente = clienteOpt.get();
+            // Comparar la contraseña cifrada con la almacenada
+            if (cliente.getContrasena().equals(hashPassword(contrasena))) {
+                return "Usuario autenticado correctamente";
             } else {
-                return "400";
+                return "Credenciales incorrectas";
             }
         } else {
-            return "400";
+            return "Usuario no encontrado";
+        }
+    }
+
+    // Método para cifrar la contraseña usando SHA-256
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al cifrar la contraseña", e);
         }
     }
 }
