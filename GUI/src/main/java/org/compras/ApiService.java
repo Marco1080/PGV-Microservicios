@@ -1,5 +1,7 @@
+// ApiService.java - Restaurado y adaptado
 package org.compras;
 
+import okhttp3.ResponseBody;
 import org.compras.model.Cliente;
 import org.compras.model.Compra;
 import org.compras.model.Producto;
@@ -25,12 +27,16 @@ public interface ApiService {
     @POST("/api/compra")
     Call<Compra> realizarCompra(@Body Compra compra);
 
+    // Restaurado para que /api/login sea el registro
     @POST("/api/login")
     Call<String> registrarUsuario(@Body Cliente cliente);
 
+
     @GET("/api/user")
-    Call<String> verificarUsuario(@Query("nombre") String nombre, @Query("contrasena") String contrasena);
+    Call<ResponseBody> verificarUsuario(@Query("nombre") String nombre, @Query("contrasena") String contrasena);
+
 }
+
 
 
 

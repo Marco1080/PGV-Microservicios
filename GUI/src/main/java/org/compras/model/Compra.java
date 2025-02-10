@@ -4,11 +4,11 @@ import java.util.List;
 
 public class Compra {
     private Integer id;
-    private String usuario;
-    private List<Producto> productos;
+    private final String cliente;
+    private final List<Producto> productos;
 
-    public Compra(String usuario, List<Producto> productos) {
-        this.usuario = usuario;
+    public Compra(String cliente, List<Producto> productos) {
+        this.cliente = cliente;
         this.productos = productos;
     }
 
@@ -16,17 +16,17 @@ public class Compra {
         return id;
     }
 
-    public String getUsuario() {
-        return usuario;
+    public String getCliente() {
+        return cliente;
     }
 
     public List<Producto> getProductos() {
         return productos;
     }
 
-    public Compra(Integer id, String usuario, List<Producto> productos) {
+    public Compra(Integer id, String cliente, List<Producto> productos) {
         this.id = id;
-        this.usuario = usuario;
+        this.cliente = cliente;
         this.productos = productos;
     }
 }

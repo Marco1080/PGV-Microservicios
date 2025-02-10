@@ -27,6 +27,7 @@ public class HelloApplication extends Application {
     }
 
     public static void showProductView(String username) throws Exception {
+        System.out.println(username);
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/org/compras/product_view.fxml"));
         Parent root = fxmlLoader.load();
 
@@ -38,6 +39,7 @@ public class HelloApplication extends Application {
     }
 
     public static void showAdminView(String username) throws Exception {
+        System.out.println(username);
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/org/compras/admin_view.fxml"));
         Parent root = fxmlLoader.load();
 

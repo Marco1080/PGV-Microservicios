@@ -2,6 +2,7 @@ package org.example.apiproductos.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,19 +13,19 @@ public class Compra {
     @Column(name = "id_compra", nullable = false)
     private Integer id;
 
-    @Column(name = "fecha", nullable = false)
+    @Column(name = "fecha")
     private LocalDate fecha;
 
-    @Column(name = "cliente", nullable = false)
+    @Column(name = "cliente")
     private String cliente;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})  // Se corrige el manejo de la relación
     @JoinTable(
             name = "compra_producto",
             joinColumns = @JoinColumn(name = "id_compra"),
             inverseJoinColumns = @JoinColumn(name = "id_producto")
     )
-    private List<Producto> productos;
+    private List<Producto> productos = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -56,5 +57,22 @@ public class Compra {
 
     public void setProductos(List<Producto> productos) {
         this.productos = productos;
+        for (Producto p : productos) {
+            p.getCompras().add(this);  // Sincronizar la relación bidireccional
+        }
     }
+
+    @Override
+    public String toString() {
+        return "Compra{" +
+                "id=" + id +
+                ", cliente='" + cliente + '\'' +
+                ", fecha=" + fecha +
+                ", productos=" + productos.stream()
+                .map(producto -> "{id=" + producto.getId() + ", nombre=" + producto.getNombre() + "}")
+                .toList() +
+                '}';
+    }
+
 }
+

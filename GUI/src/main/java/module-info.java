@@ -16,4 +16,5 @@ module org.compras {
     requires okhttp3;
     requires com.google.gson;
     requires okio;
+    requires org.apache.commons.net;
 }

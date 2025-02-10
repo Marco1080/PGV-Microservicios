@@ -17,29 +17,30 @@ public class ClienteController {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    // Registro (Manteniendo la función original en /api/login)
     @PostMapping("/login")
-    public String crearUsuario(@RequestBody Cliente cliente) {
+    public String registrarUsuario(@RequestBody Cliente cliente) {
         if (repositorio.findById(cliente.getNombre()).isPresent()) {
-            return "400";
+            return "400"; // Usuario ya existe
         }
-
         cliente.setContrasena(passwordEncoder.encode(cliente.getContrasena()));
         repositorio.save(cliente);
-        return "200";
+        return "200"; // Registro exitoso
     }
 
+    // Login (Adaptado para manejar respuestas de Retrofit correctamente)
     @GetMapping("/user")
     public String verificarUsuario(@RequestParam String nombre, @RequestParam String contrasena) {
         Optional<Cliente> clienteOpt = repositorio.findById(nombre);
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
             if (passwordEncoder.matches(contrasena, cliente.getContrasena())) {
-                return "Usuario autenticado correctamente";
+                return "200";
             } else {
-                return "Credenciales incorrectas";
+                return "401";
             }
         } else {
-            return "Usuario no encontrado";
+            return "404";
         }
     }
 }

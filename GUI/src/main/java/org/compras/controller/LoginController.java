@@ -1,9 +1,11 @@
+// LoginController.java - Restaurado y adaptado
 package org.compras.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import okhttp3.ResponseBody;
 import org.compras.ApiService;
 import org.compras.HelloApplication;
 import org.compras.model.Cliente;
@@ -24,7 +26,7 @@ public class LoginController {
 
     public void initialize() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:9090") // Asegúrate de que este puerto sea el correcto
+                .baseUrl("http://localhost:8082")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -48,7 +50,7 @@ public class LoginController {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 Platform.runLater(() -> {
-                    if (response.isSuccessful() && response.body() != null && response.body().equals("200")) {
+                    if (response.isSuccessful() && "200".equals(response.body())) {
                         showAlert("Éxito", "Usuario registrado correctamente.");
                         try {
                             HelloApplication.showProductView(username);
@@ -79,32 +81,37 @@ public class LoginController {
             return;
         }
 
-        Call<String> call = apiService.verificarUsuario(username, password);
-        call.enqueue(new Callback<>() {
+        Call<ResponseBody> call = apiService.verificarUsuario(username, password);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Platform.runLater(() -> {
-                    if (response.isSuccessful() && response.body() != null) {
-                        String respuesta = response.body();
-                        if (respuesta.equals("Usuario autenticado correctamente")) {
-                            showAlert("Éxito", "Inicio de sesión exitoso.");
-                            try {
-                                HelloApplication.showProductView(username);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                showAlert("Error", "No se pudo abrir la vista de productos.");
+                    try {
+                        if (response.isSuccessful() && response.body() != null) {
+                            String respuesta = response.body().string(); // Convierte ResponseBody a String
+                            if ("Usuario autenticado correctamente".equals(respuesta.trim())) {
+                                showAlert("Éxito", "Inicio de sesión exitoso.");
+                                try {
+                                    HelloApplication.showProductView(username);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    showAlert("Error", "No se pudo abrir la vista de productos.");
+                                }
+                            } else {
+                                showAlert("Error", respuesta); // Muestra el mensaje exacto de la API
                             }
                         } else {
-                            showAlert("Error", "Credenciales incorrectas o usuario no encontrado.");
+                            showAlert("Error", "Error en la autenticación.");
                         }
-                    } else {
-                        showAlert("Error", "Error en la autenticación.");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        showAlert("Error", "No se pudo leer la respuesta.");
                     }
                 });
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Platform.runLater(() -> showAlert("Error", "No se pudo conectar con el servidor."));
             }
         });

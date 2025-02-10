@@ -1,7 +1,9 @@
 package org.example.apiproductos.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,8 +23,9 @@ public class Producto {
     @Column(name = "stock", nullable = false)
     private Integer stock;
 
-    @ManyToMany(mappedBy = "productos")
-    private List<Compra> compras;
+    @ManyToMany(mappedBy = "productos", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JsonIgnore
+    private List<Compra> compras = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -64,3 +67,4 @@ public class Producto {
         this.compras = compras;
     }
 }
+

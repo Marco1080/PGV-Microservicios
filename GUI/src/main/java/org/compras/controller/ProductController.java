@@ -1,9 +1,11 @@
 package org.compras.controller;
 
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.compras.ApiService;
+import org.compras.FTPCompraService;
 import org.compras.model.Compra;
 import org.compras.model.Producto;
 import retrofit2.Call;
@@ -99,30 +101,49 @@ public class ProductController {
             return;
         }
 
+        // Asegurarse de que el username no sea null ni vacío
+        if (username == null || username.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Error: No se ha detectado el usuario.");
+            return;
+        }
+        System.out.println(username);
+        // Crear el objeto Compra asegurando que el cliente está definido
         Compra compra = new Compra(username, productosSeleccionados);
 
-        apiService.realizarCompra(compra).enqueue(new Callback<Compra>() {
+        // Enviar la compra a la API
+        apiService.realizarCompra(compra).enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<Compra> call, Response<Compra> response) {
                 if (response.isSuccessful()) {
                     showAlert(Alert.AlertType.INFORMATION, "Compra realizada con éxito.");
                     loadProducts();
                 } else {
+                    System.out.println(response.message() + response.body());
                     showAlert(Alert.AlertType.ERROR, "Error al realizar la compra.");
                 }
             }
 
             @Override
             public void onFailure(Call<Compra> call, Throwable throwable) {
+                System.out.println();
+                throwable.printStackTrace();
                 showAlert(Alert.AlertType.ERROR, "Error de conexión: " + throwable.getMessage());
             }
         });
+
+        double totalCompra = productosSeleccionados.stream().mapToDouble(Producto::getPrecio).sum();
+        int cantidadProductos = productosSeleccionados.size();
+        FTPCompraService ftpCompraService = new FTPCompraService();
+        ftpCompraService.registrarCompraEnFTP(username, cantidadProductos, totalCompra);
     }
 
+
     private void showAlert(Alert.AlertType type, String message) {
-        Alert alert = new Alert(type);
-        alert.setContentText(message);
-        alert.showAndWait();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 
     public void setUsername(String username) {
