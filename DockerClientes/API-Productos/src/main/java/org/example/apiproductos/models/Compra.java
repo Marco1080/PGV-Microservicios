@@ -1,9 +1,19 @@
 package org.example.apiproductos.models;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "compras")
@@ -19,7 +29,7 @@ public class Compra {
     @Column(name = "cliente")
     private String cliente;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})  // Se corrige el manejo de la relación
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "compra_producto",
             joinColumns = @JoinColumn(name = "id_compra"),
@@ -58,7 +68,7 @@ public class Compra {
     public void setProductos(List<Producto> productos) {
         this.productos = productos;
         for (Producto p : productos) {
-            p.getCompras().add(this);  // Sincronizar la relación bidireccional
+            p.getCompras().add(this);
         }
     }
 

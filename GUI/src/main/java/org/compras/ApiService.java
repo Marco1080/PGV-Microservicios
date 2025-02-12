@@ -1,14 +1,21 @@
 // ApiService.java - Restaurado y adaptado
 package org.compras;
 
-import okhttp3.ResponseBody;
+import java.util.List;
+
 import org.compras.model.Cliente;
 import org.compras.model.Compra;
 import org.compras.model.Producto;
-import retrofit2.Call;
-import retrofit2.http.*;
 
-import java.util.List;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -27,7 +34,6 @@ public interface ApiService {
     @POST("/api/compra")
     Call<Compra> realizarCompra(@Body Compra compra);
 
-    // Restaurado para que /api/login sea el registro
     @POST("/api/login")
     Call<String> registrarUsuario(@Body Cliente cliente);
 

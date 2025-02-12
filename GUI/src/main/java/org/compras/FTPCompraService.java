@@ -1,18 +1,23 @@
 package org.compras;
 
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
 public class FTPCompraService {
 
-    private static final String SERVER = "localhost"; // Cambia según tu configuración
+    private static final String SERVER = "localhost";
     private static final int PORT = 21;
-    private static final String USER = "root"; // Usuario genérico
-    private static final String PASSWORD = "root"; // Contraseña genérica
-    private static final String FTP_DIRECTORY = "/compras"; // Directorio en el servidor FTP
+    private static final String USER = "root";
+    private static final String PASSWORD = "root";
+    private static final String FTP_DIRECTORY = "/compras"; 
 
     public void registrarCompraEnFTP(String username, int cantidadProductos, double totalCompra) {
         FTPClient ftpClient = new FTPClient();
@@ -22,11 +27,9 @@ public class FTPCompraService {
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            // Nombre del archivo basado en el usuario
             String fileName = username + "_compras.txt";
             String filePath = FTP_DIRECTORY + "/" + fileName;
 
-            // Verificar si el archivo ya existe en el servidor
             boolean archivoExiste = false;
             for (String file : ftpClient.listNames(FTP_DIRECTORY)) {
                 if (file.equals(filePath)) {
@@ -35,7 +38,6 @@ public class FTPCompraService {
                 }
             }
 
-            // Descargar el archivo si existe
             StringBuilder contenido = new StringBuilder();
             if (archivoExiste) {
                 InputStream inputStream = ftpClient.retrieveFileStream(filePath);
@@ -50,12 +52,10 @@ public class FTPCompraService {
                 }
             }
 
-            // Agregar nueva compra
             String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             contenido.append(fechaHora).append(" - Productos: ").append(cantidadProductos)
                     .append(" - Total: $").append(totalCompra).append("\n");
 
-            // Subir el archivo actualizado al FTP
             try (InputStream inputStream = new ByteArrayInputStream(contenido.toString().getBytes())) {
                 ftpClient.storeFile(filePath, inputStream);
             }

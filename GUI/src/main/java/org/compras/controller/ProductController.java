@@ -38,7 +38,7 @@ public class ProductController {
 
     private ApiService apiService;
 
-    private String username = ""; // Esta variable se actualizará en el login
+    private String username = "";
 
     @FXML
     private void initialize() {
